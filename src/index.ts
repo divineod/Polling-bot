@@ -50,7 +50,7 @@ async function fetchData() {
     return scheduleByDay
 }
 
-app.get('/fetch-data', async (req, res) => {
+app.get('/', async (req, res) => {
     try {
         const data = await fetchData()
         res.status(200).send(data)
