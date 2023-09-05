@@ -78,7 +78,7 @@ function fetchData() {
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield fetchData();
-        res.status(200).send(data);
+        res.json(data);
     }
     catch (error) {
         res.status(500).send('Error fetching data.');

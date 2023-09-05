@@ -53,7 +53,7 @@ async function fetchData() {
 app.get('/', async (req, res) => {
     try {
         const data = await fetchData()
-        res.status(200).send(data)
+        res.json(data)
     } catch (error) {
         res.status(500).send('Error fetching data.')
     }
