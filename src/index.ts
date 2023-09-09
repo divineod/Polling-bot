@@ -1,10 +1,13 @@
-import { time } from 'console'
 import express, { Request, Response } from 'express'
-const entryURL = 'https://termin.bremen.de/termine/select2?md=13'
 const axios = require('axios')
 const cookieParser = require('cookie')
-import * as cheerio from 'cheerio';
+import * as cheerio from 'cheerio'
 
+import { TelegramConnection } from './bot'
+import { FirestoreUserRepository } from './firestore'
+import { credential } from 'firebase-admin'
+
+const serviceAccount = require('../google.json');
 
 
 const app = express()
@@ -63,10 +66,13 @@ app.get('/Bremen-nord', async (req: Request, res: Response) => {
     }
 });
 
+app.get('/', async (req: Request, res: Response) => {
+    let key = "[redacted]"
+
+    let userRepository = new FirestoreUserRepository(serviceAccount)
+    let tgConnection = new TelegramConnection(key, userRepository)
+})
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-
-
-

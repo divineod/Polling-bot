@@ -36,10 +36,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const entryURL = 'https://termin.bremen.de/termine/select2?md=13';
 const axios = require('axios');
 const cookieParser = require('cookie');
 const cheerio = __importStar(require("cheerio"));
+const bot_1 = require("./bot");
+const firestore_1 = require("./firestore");
+const serviceAccount = require('../google.json');
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8080;
 const ENTRY_URL_1 = 'https://termin.bremen.de/termine/select2?md=13';
@@ -91,6 +93,11 @@ app.get('/Bremen-nord', (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (error) {
         res.status(500).send('Error fetching data from /Bremen-nord.');
     }
+}));
+app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let key = "[redacted]";
+    let userRepository = new firestore_1.FirestoreUserRepository(serviceAccount);
+    let tgConnection = new bot_1.TelegramConnection(key, userRepository);
 }));
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
