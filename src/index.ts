@@ -10,55 +10,63 @@ import * as cheerio from 'cheerio';
 const app = express()
 const port = process.env.PORT || 8080
 
-async function fetchData() {
-    const rawCookies = (await axios.get(entryURL)).headers['set-cookie']
-    const cookies = cookieParser.parse(rawCookies[1])
+const ENTRY_URL_1 = 'https://termin.bremen.de/termine/select2?md=13';
+const SUGGEST_URL_1 = 'https://termin.bremen.de/termine/suggest?mdt=704&select_cnc=1&cnc-8662=1&Strafanzeige+erstatten+=Weiter+1';
 
-    const timeSlotsHTML = (await axios.get('https://termin.bremen.de/termine/suggest?mdt=704&select_cnc=1&cnc-8662=1&Strafanzeige+erstatten+=Weiter+1', {
+const ENTRY_URL_2 = 'https://termin.bremen.de/termine/select2?md=6';
+const SUGGEST_URL_2 = 'https://termin.bremen.de/termine/suggest?cnc-8793=1&loc=681';
+
+async function fetchData(entryURL: string, suggestURL: string): Promise<{ [date: string]: string[] }> {
+    const rawCookies = (await axios.get(entryURL)).headers['set-cookie'];
+    const cookies = cookieParser.parse(rawCookies[1]);
+    const timeSlotsHTML = (await axios.get(suggestURL, {
         headers: {
             Cookie: `cookie_accept=1; TVWebSession=${cookies.TVWebSession}`
         }
-    })).data
-
+    })).data;
 
     const $ = cheerio.load(timeSlotsHTML);
-    // Create a dictionary to store the data aggregated by day
     const scheduleByDay: { [date: string]: string[] } = {};
 
-    // Iterate through each 'h3' element with a title attribute containing the date
     $('h3[title]').each((index, element) => {
         const title = $(element).attr('title');
-        const dateMatch = /(\d{2}\.\d{2}.\d{4})/.exec(title); // Match the date format
+        const dateMatch = /(\d{2}\.\d{2}.\d{4})/.exec(title);
         if (dateMatch) {
             const date = dateMatch[0];
             const timeSlots: string[] = [];
-
-            // Find the associated 'table' element with class 'sugg_table'
             const table = $(element).next('div').find('table.sugg_table');
-
-            // Iterate through each 'tr' element in the table to extract the time slots
             table.find('tr').each((index, row) => {
-                const timeSlot = $(row).find('th span[aria-hidden]').text(); // Extract time slot
+                const timeSlot = $(row).find('th span[aria-hidden]').text();
                 timeSlots.push(timeSlot);
             });
-
-            // Store the time slots for this date in the dictionary
             scheduleByDay[date] = timeSlots;
         }
     });
-
-    return scheduleByDay
+    return scheduleByDay;
 }
 
-app.get('/', async (req, res) => {
+app.get('/Bremen-mitte', async (req: Request, res: Response) => {
     try {
-        const data = await fetchData()
-        res.json(data)
+        const data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
+        res.json(data);
     } catch (error) {
-        res.status(500).send('Error fetching data.')
+        res.status(500).send('Error fetching data from Bremen-mitte.');
+    }
+});
+
+app.get('/Bremen-nord', async (req: Request, res: Response) => {
+    try {
+        const data = await fetchData(ENTRY_URL_2, SUGGEST_URL_2);
+        res.json(data);
+    } catch (error) {
+        res.status(500).send('Error fetching data from /Bremen-nord.');
     }
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
+    console.log(`Server is running on port ${port}`);
 });
+
+
+
+
