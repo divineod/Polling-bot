@@ -20,7 +20,7 @@ export class TelegramConnection {
     private setupBotListeners() {
         this.bot.onText(/\/start/, async (msg) => {
 
-            const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name})
+            const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name })
 
             console.log(`Got or created user ${isCreated} ${user}`)
 
@@ -43,5 +43,9 @@ export class TelegramConnection {
         })
 
         console.log('Telegram bot is running...')
+    }
+
+    async sendMessage(chatId: string, message: string) {
+        this.bot.sendMessage(chatId, message)
     }
 }

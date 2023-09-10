@@ -41,6 +41,11 @@ class TelegramConnection {
         });
         console.log('Telegram bot is running...');
     }
+    sendMessage(chatId, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.bot.sendMessage(chatId, message);
+        });
+    }
 }
 exports.TelegramConnection = TelegramConnection;
 //# sourceMappingURL=bot.js.map

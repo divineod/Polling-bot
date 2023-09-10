@@ -17,11 +17,20 @@ const bot_1 = require("./bot");
 const firestore_1 = require("./firestore");
 const fetcher_1 = require("./fetcher");
 const settings_1 = require("./settings");
+const cron_1 = require("./cron");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8080;
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userRepository = new firestore_1.FirestoreUserRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
     let _ = new bot_1.TelegramConnection(settings_1.validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
+    (0, fetcher_1.fetchPolizei)().then((timeTable) => {
+        userRepository.mapAll((user) => {
+            _.sendMessage(user.id, JSON.stringify(timeTable, undefined, 4));
+        });
+    });
+}));
+app.get('cron', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, cron_1.runCronJob)(req, res);
 }));
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

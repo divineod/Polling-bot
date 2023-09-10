@@ -35,9 +35,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirestoreUserRepository = exports.FirestoreRepository = void 0;
 const admin = __importStar(require("firebase-admin"));
 const app_1 = require("firebase-admin/app");
+const firewalk_1 = require("firewalk");
 class FirestoreRepository {
     constructor(credential, collectionPath) {
-        admin.initializeApp({ credential: (0, app_1.cert)(credential) }); // Initialize Firebase Admin SDK
+        if (!FirestoreRepository.isInitialized) {
+            FirestoreRepository.isInitialized = true;
+            admin.initializeApp({ credential: (0, app_1.cert)(credential) }); // Initialize Firebase Admin SDK
+        }
         // Get a reference to the Firestore collection
         this.collection = admin.firestore().collection(collectionPath);
     }
@@ -84,8 +88,22 @@ class FirestoreRepository {
             return documents;
         });
     }
+    mapAll(func) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let traverser = (0, firewalk_1.createTraverser)(this.collection);
+            const { batchCount, docCount } = yield traverser.traverse((batchDocs, batchIndex) => __awaiter(this, void 0, void 0, function* () {
+                const batchSize = batchDocs.length;
+                yield Promise.all(batchDocs.map((doc) => __awaiter(this, void 0, void 0, function* () {
+                    const { email, firstName } = doc.data();
+                    yield func(doc);
+                })));
+                console.log(`Batch ${batchIndex} done! We executed ${func} ${batchSize} users in this batch.`);
+            }));
+        });
+    }
 }
 exports.FirestoreRepository = FirestoreRepository;
+FirestoreRepository.isInitialized = false;
 class FirestoreUserRepository extends FirestoreRepository {
     constructor(credential) {
         super(credential, "users");

@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import { cert } from 'firebase-admin/app';
+import { createTraverser } from 'firewalk';
 
 
 interface BaseEntity {
@@ -9,8 +10,15 @@ interface BaseEntity {
 export class FirestoreRepository<T extends BaseEntity> {
     private collection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
 
+    private static isInitialized: boolean = false;
+
+
     constructor(credential: string, collectionPath: string) {
-        admin.initializeApp({ credential: cert(credential) }); // Initialize Firebase Admin SDK
+
+        if (!FirestoreRepository.isInitialized) {
+            FirestoreRepository.isInitialized = true;
+            admin.initializeApp({ credential: cert(credential) }); // Initialize Firebase Admin SDK
+        }
 
         // Get a reference to the Firestore collection
         this.collection = admin.firestore().collection(collectionPath);
@@ -53,6 +61,23 @@ export class FirestoreRepository<T extends BaseEntity> {
         });
 
         return documents;
+    }
+
+    async mapAll(func: CallableFunction): Promise<any> {
+
+        let traverser = createTraverser(this.collection);
+        const { batchCount, docCount } = await traverser.traverse(async (batchDocs, batchIndex) => {
+            const batchSize = batchDocs.length;
+
+            await Promise.all(
+                batchDocs.map(async (doc) => {
+                    const { email, firstName } = doc.data();
+                    await func(doc);
+                })
+            );
+            console.log(`Batch ${batchIndex} done! We executed ${func} ${batchSize} users in this batch.`);
+        });
+
     }
 }
 

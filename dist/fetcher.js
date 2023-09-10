@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchData = exports.SUGGEST_URL_2 = exports.ENTRY_URL_2 = exports.SUGGEST_URL_1 = exports.ENTRY_URL_1 = void 0;
+exports.fetchBremenNord = exports.fetchPolizei = exports.fetchData = exports.SUGGEST_URL_2 = exports.ENTRY_URL_2 = exports.SUGGEST_URL_1 = exports.ENTRY_URL_1 = void 0;
 const axios = require('axios');
 const cookieParser = require('cookie');
 const cheerio = __importStar(require("cheerio"));
@@ -69,4 +69,16 @@ function fetchData(entryURL, suggestURL) {
     });
 }
 exports.fetchData = fetchData;
+function fetchPolizei() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield fetchData(exports.ENTRY_URL_1, exports.SUGGEST_URL_1);
+    });
+}
+exports.fetchPolizei = fetchPolizei;
+function fetchBremenNord() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield fetchData(exports.ENTRY_URL_2, exports.SUGGEST_URL_2);
+    });
+}
+exports.fetchBremenNord = fetchBremenNord;
 //# sourceMappingURL=fetcher.js.map

@@ -38,3 +38,11 @@ export async function fetchData(entryURL: string, suggestURL: string): Promise<{
     });
     return scheduleByDay;
 }
+
+export async function fetchPolizei(): Promise<{ [date: string]: string[] }> {
+    return await fetchData(ENTRY_URL_1, SUGGEST_URL_1)
+}
+
+export async function fetchBremenNord() {
+    return await fetchData(ENTRY_URL_2, SUGGEST_URL_2)
+}
