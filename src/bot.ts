@@ -1,5 +1,6 @@
 import TelegramBot = require('node-telegram-bot-api')
 import { FirestoreUserRepository, User } from "./firestore"
+import { ENTRY_URL_1, ENTRY_URL_2, SUGGEST_URL_1, SUGGEST_URL_2, fetchData } from './fetcher'
 
 
 export class TelegramConnection {
@@ -29,6 +30,8 @@ export class TelegramConnection {
                 this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.chatId}!`)
             }
 
+            let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1)
+            this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4))
         })
 
         this.bot.on('text', async (msg) => {

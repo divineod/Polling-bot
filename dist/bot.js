@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TelegramConnection = void 0;
 const TelegramBot = require("node-telegram-bot-api");
+const fetcher_1 = require("./fetcher");
 class TelegramConnection {
     constructor(token, userRepository) {
         // Initialize the Telegram Bot
@@ -29,6 +30,8 @@ class TelegramConnection {
             else {
                 this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.chatId}!`);
             }
+            let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
+            this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
         }));
         this.bot.on('text', (msg) => __awaiter(this, void 0, void 0, function* () {
             this.bot.sendMessage(msg.chat.id, "I am online!");
