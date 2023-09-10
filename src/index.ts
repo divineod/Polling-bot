@@ -2,21 +2,16 @@ import express, { Request, Response } from 'express'
 
 import { TelegramConnection } from './bot'
 import { FirestoreUserRepository } from './firestore'
-import { credential } from 'firebase-admin'
 import { fetchData, ENTRY_URL_1, SUGGEST_URL_1, ENTRY_URL_2, SUGGEST_URL_2 } from './fetcher';
-
-const serviceAccount = require('../google.json');
-
+import { validatedEnv } from './settings';
 
 const app = express()
 const port = process.env.PORT || 8080
 
 
 app.get('/', async (req: Request, res: Response) => {
-    let key = "[redacted]"
-
-    let userRepository = new FirestoreUserRepository(serviceAccount)
-    let tgConnection = new TelegramConnection(key, userRepository)
+    let userRepository = new FirestoreUserRepository(validatedEnv.GOOGLE_CREDENTIALS)
+    let _ = new TelegramConnection(validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository)
 })
 
 app.listen(port, () => {

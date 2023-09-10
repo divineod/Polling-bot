@@ -22,13 +22,13 @@ class TelegramConnection {
     }
     setupBotListeners() {
         this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
-            const [isCreated, user] = yield this.userRepository.getOrCreate({ chatId: msg.chat.id.toString() });
+            const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
             console.log(`Got or created user ${isCreated} ${user}`);
             if (isCreated) {
-                this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.chatId}!`);
+                this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.firstName}!`);
             }
             else {
-                this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.chatId}!`);
+                this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.firstName}!`);
             }
             let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
             this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));

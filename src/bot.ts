@@ -20,14 +20,14 @@ export class TelegramConnection {
     private setupBotListeners() {
         this.bot.onText(/\/start/, async (msg) => {
 
-            const [isCreated, user] = await this.userRepository.getOrCreate({ chatId: msg.chat.id.toString() })
+            const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name})
 
             console.log(`Got or created user ${isCreated} ${user}`)
 
             if (isCreated) {
-                this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.chatId}!`)
+                this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.firstName}!`)
             } else {
-                this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.chatId}!`)
+                this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.firstName}!`)
             }
 
             let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1)

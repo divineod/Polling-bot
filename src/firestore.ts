@@ -1,7 +1,12 @@
 import * as admin from 'firebase-admin';
 import { cert } from 'firebase-admin/app';
 
-export class FirestoreRepository<T> {
+
+interface BaseEntity {
+    id: string
+}
+
+export class FirestoreRepository<T extends BaseEntity> {
     private collection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
 
     constructor(credential: string, collectionPath: string) {
@@ -13,7 +18,8 @@ export class FirestoreRepository<T> {
 
     // Create a new document with an automatically generated ID
     async create(data: T): Promise<T> {
-        const docRef = await this.collection.add(data);
+        const docRef = await this.collection.doc(data.id);
+        docRef.set(data)
         return data;
     }
 
@@ -50,8 +56,8 @@ export class FirestoreRepository<T> {
     }
 }
 
-export type User = {
-    chatId: string
+export interface User extends BaseEntity {
+    firstName: string
 }
 
 export class FirestoreUserRepository extends FirestoreRepository<User> {
@@ -61,7 +67,8 @@ export class FirestoreUserRepository extends FirestoreRepository<User> {
     }
 
     async getOrCreate(data: User): Promise<[boolean, User]> {
-        const user = await this.getById(data.chatId)
+        const user = await this.getById(data.id)
+
         if (user === undefined) {
             return [true, await this.create(data)]
         } else {

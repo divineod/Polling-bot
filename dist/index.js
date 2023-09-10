@@ -16,13 +16,12 @@ const express_1 = __importDefault(require("express"));
 const bot_1 = require("./bot");
 const firestore_1 = require("./firestore");
 const fetcher_1 = require("./fetcher");
-const serviceAccount = require('../google.json');
+const settings_1 = require("./settings");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8080;
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let key = "[redacted]";
-    let userRepository = new firestore_1.FirestoreUserRepository(serviceAccount);
-    let tgConnection = new bot_1.TelegramConnection(key, userRepository);
+    let userRepository = new firestore_1.FirestoreUserRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
+    let _ = new bot_1.TelegramConnection(settings_1.validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
 }));
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

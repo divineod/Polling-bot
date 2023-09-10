@@ -44,7 +44,8 @@ class FirestoreRepository {
     // Create a new document with an automatically generated ID
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const docRef = yield this.collection.add(data);
+            const docRef = yield this.collection.doc(data.id);
+            docRef.set(data);
             return data;
         });
     }
@@ -91,7 +92,7 @@ class FirestoreUserRepository extends FirestoreRepository {
     }
     getOrCreate(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield this.getById(data.chatId);
+            const user = yield this.getById(data.id);
             if (user === undefined) {
                 return [true, yield this.create(data)];
             }
