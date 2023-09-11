@@ -24,7 +24,7 @@
     "cheerio": "^1.0.0-rc.12",
     "cookie": "^0.5.0",
     "express": "^4.18.2",
-    "firebase-admin": "^11.10.1",
+    "firebase-admin": "^10.3.0",
     "firewalk": "^1.0.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.1",
