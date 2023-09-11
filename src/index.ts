@@ -19,6 +19,10 @@ app.get('/', async (req: Request, res: Response) => {
     })
 })
 
+app.get('cron', async (req: Request, res: Response) => {
+    runCronJob(req, res)
+})
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
