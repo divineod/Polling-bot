@@ -1,0 +1,34 @@
+name: Scheduled Cron Job
+
+on:
+  schedule:
+    # Runs every hour
+    - cron: '*/2 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.13.0]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run cron function
+      run: |
+        echo "$GOOGLE_CREDENTIALS" | base64 -d > google-credentials.json
+        node cron.js
+      env:
+        TELEGRAM_BOT_ACCESS_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
