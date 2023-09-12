@@ -1,9 +1,7 @@
 name: Scheduled Cron Job
 
 on:
-  schedule:
-    # Runs every hour
-    - cron: '45 12 12 9 *'
+  workflow_dispatch:
 
 jobs:
   build:
