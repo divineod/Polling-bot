@@ -100,4 +100,9 @@ export class FirestoreUserRepository extends FirestoreRepository<User> {
             return [false, user]
         }
     }
+
+    async userExists(userId: string): Promise<boolean> {
+        const user = await this.getById(userId);
+        return user !== undefined;
+    }
 }

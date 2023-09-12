@@ -47,9 +47,21 @@ class TelegramConnection {
         });
         console.log('Telegram bot is running...');
     }
+    // async sendMessage(chatId: string, message: string) {
+    //     this.bot.sendMessage(chatId, message)
+    // }
     sendMessage(chatId, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.bot.sendMessage(chatId, message);
+            // Check if the user exists in the repository before sending a message
+            const userExists = yield this.userRepository.userExists(chatId);
+            if (userExists) {
+                this.bot.sendMessage(chatId, message).catch(error => {
+                    console.error(`Error sending message to ${chatId}: ${error.message || error}`);
+                });
+            }
+            else {
+                console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);
+            }
         });
     }
 }
