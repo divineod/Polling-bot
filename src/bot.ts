@@ -19,6 +19,11 @@ export class TelegramConnection {
 
     private async setupBotListeners() {
 
+        // Scrape the data
+        let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
+        let data2 = await fetchData(ENTRY_URL_2, SUGGEST_URL_2);
+
+
         // Fetch all users
         const users = await this.userRepository.getAllUsers();
 
@@ -28,13 +33,16 @@ export class TelegramConnection {
             if (user.id) {
                 console.log(`Sending data to user ${user.firstName}`);
 
-                let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
                 this.bot.sendMessage(user.id, `These are the dates from Polizei, ${user.firstName}!`)
                 this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
 
-                let data2 = await fetchData(ENTRY_URL_2, SUGGEST_URL_2);
-                this.bot.sendMessage(user.id, `These are the dates from nord, ${user.firstName}!`)
-                this.bot.sendMessage(user.id, JSON.stringify(data2, undefined, 4));
+                // Check if dates available from nord is an empty dictionary
+                if (Object.keys(data2).length === 0) {
+                    this.bot.sendMessage(user.id, `No dates available from nord yet, ${user.firstName}!`);
+                } else {
+                    this.bot.sendMessage(user.id, `These are the dates from nord, ${user.firstName}!`);
+                    this.bot.sendMessage(user.id, JSON.stringify(data2, undefined, 4));
+                }
             } else {
                 console.log(`Skipping user ${user.firstName} because they don't have not initiated a chat with the bot.`);
             }
