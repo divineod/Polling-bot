@@ -39,8 +39,9 @@ export class TelegramConnection {
         })
 
         this.bot.on('polling_error', (error) => {
-            console.error(`Telegram polling error: ${error}`)
-        })
+            console.error(`Telegram polling error: ${error.message || error}`);
+        });
+
 
         console.log('Telegram bot is running...')
     }
