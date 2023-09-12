@@ -16,7 +16,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/divineod/Polling-bot/actions/runs | \
-          jq '.workflow_runs[] | select([.status] | inside(["in_progress", "queued"])) | .id')
+          jq '.workflow_runs[] | select([.status] | inside(["in_progress"])) | .id')
 
           for i in $ids; do 
             curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
