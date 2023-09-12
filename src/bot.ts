@@ -24,10 +24,19 @@ export class TelegramConnection {
 
         // Loop over all users and send them the data
         for (const user of users) {
-            console.log(`Sending data to user ${user.firstName}`);
 
-            let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
-            this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+            if (user.id) {
+                console.log(`Sending data to user ${user.firstName}`);
+
+                let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
+                this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+            } else {
+                console.log(`Skipping user ${user.firstName} because they don't have not initiated a chat with the bot.`);
+            }
+            // console.log(`Sending data to user ${user.firstName}`);
+            //
+            // let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
+            // this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
         }
 
 
