@@ -1,8 +1,7 @@
 name: Manual Cron Job
 
 on:
-  schedule:
-    - cron: "30,35,40,45,50,55 7 * * *
+  workflow_dispatch:
 
 jobs:
   build:
