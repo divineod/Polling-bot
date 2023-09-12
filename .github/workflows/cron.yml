@@ -1,8 +1,7 @@
 name: Scheduled Cron Job
 
 on:
-  schedule:
-     - cron: "5,10,15,20,25,30,35,40,45,50,55 * * * *"
+  workflow_dispatch:
 
 jobs:
 
