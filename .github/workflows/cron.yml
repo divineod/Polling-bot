@@ -4,6 +4,30 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  check_previous_runs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        run: |
+          response=$(curl \
+            -X GET \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ github.workflow }}/runs?status=in_progress")
+
+          run_ids=$(echo $response | jq '.workflow_runs[] | select(.head_sha != "${{ github.sha }}") | .id')
+
+          for run_id in $run_ids
+          do
+            curl \
+              -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/$run_id/cancel"
+          done
+
   build:
     runs-on: ubuntu-latest
 
