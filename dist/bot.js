@@ -33,11 +33,17 @@ class TelegramConnection {
             let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
             this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
         }));
+        this.bot.onText(/\/nord/, (msg) => __awaiter(this, void 0, void 0, function* () {
+            const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
+            console.log(`Got or created user ${isCreated} ${user}`);
+            let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
+            this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
+        }));
         this.bot.on('text', (msg) => __awaiter(this, void 0, void 0, function* () {
             this.bot.sendMessage(msg.chat.id, "I am online!");
         }));
         this.bot.on('polling_error', (error) => {
-            console.error(`Telegram polling error: ${error}`);
+            console.error(`Telegram polling error: ${error.message || error}`);
         });
         console.log('Telegram bot is running...');
     }

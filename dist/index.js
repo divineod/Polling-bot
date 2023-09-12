@@ -28,9 +28,6 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     });
 }));
-app.get('cron', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    runCronJob(req, res);
-}));
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
