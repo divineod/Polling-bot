@@ -1,4 +1,4 @@
-name: Scheduled Cron Job
+name: Manual Cron Job
 
 on:
   schedule:
