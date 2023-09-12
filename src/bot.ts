@@ -34,6 +34,16 @@ export class TelegramConnection {
             this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4))
         })
 
+        this.bot.onText(/\/nord/, async (msg) => {
+
+            const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name })
+
+            console.log(`Got or created user ${isCreated} ${user}`)
+
+            let data = await fetchData(ENTRY_URL_2, SUGGEST_URL_2)
+            this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4))
+        })
+
         this.bot.on('text', async (msg) => {
             this.bot.sendMessage(msg.chat.id, "I am online!")
         })
