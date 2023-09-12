@@ -17,6 +17,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/divineod/Polling-bot/actions/workflows/Scheduled%20Cron%20Job/runs?status=in_progress")
 
+          echo $response
           run_ids=$(echo $response | jq '.workflow_runs[] | select(.head_sha != "${{ github.sha }}") | .id')
 
           for run_id in $run_ids
