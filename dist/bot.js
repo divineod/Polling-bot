@@ -29,15 +29,15 @@ class TelegramConnection {
                 if (user.id) {
                     console.log(`Sending data to user ${user.firstName}`);
                     let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
+                    this.bot.sendMessage(user.id, `These are the dates from Polizei, ${user.firstName}!`);
                     this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+                    let data2 = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
+                    this.bot.sendMessage(user.id, `These are the dates from nord, ${user.firstName}!`);
+                    this.bot.sendMessage(user.id, JSON.stringify(data2, undefined, 4));
                 }
                 else {
                     console.log(`Skipping user ${user.firstName} because they don't have not initiated a chat with the bot.`);
                 }
-                // console.log(`Sending data to user ${user.firstName}`);
-                //
-                // let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
-                // this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
             }
             this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
