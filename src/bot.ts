@@ -17,7 +17,20 @@ export class TelegramConnection {
         this.setupBotListeners()
     }
 
-    private setupBotListeners() {
+    private async setupBotListeners() {
+
+        // Fetch all users
+        const users = await this.userRepository.getAllUsers();
+
+        // Loop over all users and send them the data
+        for (const user of users) {
+            console.log(`Sending data to user ${user.firstName}`);
+
+            let data = await fetchData(ENTRY_URL_1, SUGGEST_URL_1);
+            this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+        }
+
+
         this.bot.onText(/\/start/, async (msg) => {
 
             const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name })
@@ -55,10 +68,6 @@ export class TelegramConnection {
 
         console.log('Telegram bot is running...')
     }
-
-    // async sendMessage(chatId: string, message: string) {
-    //     this.bot.sendMessage(chatId, message)
-    // }
 
     async sendMessage(chatId: string, message: string) {
     // Check if the user exists in the repository before sending a message

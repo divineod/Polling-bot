@@ -105,4 +105,15 @@ export class FirestoreUserRepository extends FirestoreRepository<User> {
         const user = await this.getById(userId);
         return user !== undefined;
     }
+
+    async getAllUsers(): Promise<User[]> {
+    const usersSnapshot = await this.collection.get();
+    const users: User[] = [];
+
+    usersSnapshot.forEach(doc => {
+        users.push(doc.data() as User);
+    });
+
+    return users;
+}
 }

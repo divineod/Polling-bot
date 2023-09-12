@@ -125,6 +125,16 @@ class FirestoreUserRepository extends FirestoreRepository {
             return user !== undefined;
         });
     }
+    getAllUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const usersSnapshot = yield this.collection.get();
+            const users = [];
+            usersSnapshot.forEach(doc => {
+                users.push(doc.data());
+            });
+            return users;
+        });
+    }
 }
 exports.FirestoreUserRepository = FirestoreUserRepository;
 //# sourceMappingURL=firestore.js.map
