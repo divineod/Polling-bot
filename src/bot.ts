@@ -28,7 +28,6 @@ export class TelegramConnection {
 
     private async setupBotListeners() {
         const dataSets = [
-            { url1: ENTRY_URL_1, url2: SUGGEST_URL_1, title: "Polizei" },
             { url1: ENTRY_URL_2, url2: SUGGEST_URL_2, title: "Nord" },
             { url1: ENTRY_URL_3, url2: SUGGEST_URL_3, title: "Mitte" }
         ];
