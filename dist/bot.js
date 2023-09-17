@@ -36,7 +36,6 @@ class TelegramConnection {
     setupBotListeners() {
         return __awaiter(this, void 0, void 0, function* () {
             const dataSets = [
-                { url1: fetcher_1.ENTRY_URL_1, url2: fetcher_1.SUGGEST_URL_1, title: "Polizei" },
                 { url1: fetcher_1.ENTRY_URL_2, url2: fetcher_1.SUGGEST_URL_2, title: "Nord" },
                 { url1: fetcher_1.ENTRY_URL_3, url2: fetcher_1.SUGGEST_URL_3, title: "Mitte" }
             ];
