@@ -14,55 +14,51 @@ const TelegramBot = require("node-telegram-bot-api");
 const fetcher_1 = require("./fetcher");
 class TelegramConnection {
     constructor(token, userRepository) {
-        // Initialize the Telegram Bot
+        this.previousData = {};
         this.bot = new TelegramBot(token, { polling: true });
-        // Initialize Firestore repository
         this.userRepository = userRepository;
         this.setupBotListeners();
+        this.broadcastToUsers();
+    }
+    broadcastToUsers(data, title) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (JSON.stringify(data) !== JSON.stringify(this.previousData[title]) && Object.keys(data).length > 0) {
+                const users = yield this.userRepository.getAllUsers();
+                for (const user of users) {
+                    if (user.id) {
+                        this.bot.sendMessage(user.id, `These are the dates from ${title}, ${user.firstName}!`);
+                        this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+                    }
+                }
+                this.previousData[title] = data;
+            }
+        });
     }
     setupBotListeners() {
         return __awaiter(this, void 0, void 0, function* () {
-            // Scrape the data
-            let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
-            let data2 = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
-            // Fetch all users
-            const users = yield this.userRepository.getAllUsers();
-            // Loop over all users and send them the data
-            for (const user of users) {
-                if (user.id) {
-                    console.log(`Sending data to user ${user.firstName}`);
-                    this.bot.sendMessage(user.id, `These are the dates from Polizei, ${user.firstName}!`);
-                    this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
-                    // Check if dates available from nord is an empty dictionary
-                    if (Object.keys(data2).length === 0) {
-                        this.bot.sendMessage(user.id, `No dates available from nord yet, ${user.firstName}!`);
-                    }
-                    else {
-                        this.bot.sendMessage(user.id, `These are the dates from nord, ${user.firstName}!`);
-                        this.bot.sendMessage(user.id, JSON.stringify(data2, undefined, 4));
-                    }
-                }
-                else {
-                    console.log(`Skipping user ${user.firstName} because they don't have not initiated a chat with the bot.`);
-                }
+            const dataSets = [
+                { url1: fetcher_1.ENTRY_URL_1, url2: fetcher_1.SUGGEST_URL_1, title: "Polizei" },
+                { url1: fetcher_1.ENTRY_URL_2, url2: fetcher_1.SUGGEST_URL_2, title: "Nord" },
+                { url1: fetcher_1.ENTRY_URL_3, url2: fetcher_1.SUGGEST_URL_3, title: "Mitte" }
+            ];
+            for (const dataSet of dataSets) {
+                const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                yield this.broadcastToUsers(data, dataSet.title);
             }
             this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
-                console.log(`Got or created user ${isCreated} ${user}`);
                 if (isCreated) {
                     this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.firstName}!`);
                 }
                 else {
                     this.bot.sendMessage(msg.chat.id, `Welcome back, ${user.firstName}!`);
                 }
-                let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1);
-                this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
             }));
             this.bot.onText(/\/nord/, (msg) => __awaiter(this, void 0, void 0, function* () {
-                const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
-                console.log(`Got or created user ${isCreated} ${user}`);
-                let data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
-                this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
+                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
+                if (Object.keys(data).length > 0) {
+                    this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
+                }
             }));
             this.bot.on('text', (msg) => __awaiter(this, void 0, void 0, function* () {
                 this.bot.sendMessage(msg.chat.id, "I am online!");
@@ -75,7 +71,6 @@ class TelegramConnection {
     }
     sendMessage(chatId, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Check if the user exists in the repository before sending a message
             const userExists = yield this.userRepository.userExists(chatId);
             if (userExists) {
                 this.bot.sendMessage(chatId, message).catch(error => {

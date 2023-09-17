@@ -8,7 +8,8 @@ export const SUGGEST_URL_1 = 'https://termin.bremen.de/termine/suggest?mdt=704&s
 export const ENTRY_URL_2 = 'https://termin.bremen.de/termine/select2?md=6';
 export const SUGGEST_URL_2 = 'https://termin.bremen.de/termine/suggest?cnc-8793=1&loc=681';
 
-
+export const ENTRY_URL_3 = 'https://termin.bremen.de/termine/select2?md=5';
+export const SUGGEST_URL_3 = 'https://termin.bremen.de/termine/suggest?cnc-8790=1&loc=680'
 
 export async function fetchData(entryURL: string, suggestURL: string): Promise<{ [date: string]: string[] }> {
     const rawCookies = (await axios.get(entryURL)).headers['set-cookie'];
@@ -45,4 +46,8 @@ export async function fetchPolizei(): Promise<{ [date: string]: string[] }> {
 
 export async function fetchBremenNord() {
     return await fetchData(ENTRY_URL_2, SUGGEST_URL_2)
+}
+
+export async function fetchBremenMitte() {
+    return await fetchData(ENTRY_URL_3, SUGGEST_URL_3)
 }
