@@ -32,12 +32,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchBremenMitte = exports.fetchBremenNord = exports.fetchPolizei = exports.fetchData = exports.SUGGEST_URL_3 = exports.ENTRY_URL_3 = exports.SUGGEST_URL_2 = exports.ENTRY_URL_2 = exports.SUGGEST_URL_1 = exports.ENTRY_URL_1 = void 0;
+exports.fetchBremenMitte = exports.fetchBremenNord = exports.fetchData = exports.SUGGEST_URL_3 = exports.ENTRY_URL_3 = exports.SUGGEST_URL_2 = exports.ENTRY_URL_2 = void 0;
 const axios = require('axios');
 const cookieParser = require('cookie');
 const cheerio = __importStar(require("cheerio"));
-exports.ENTRY_URL_1 = 'https://termin.bremen.de/termine/select2?md=13';
-exports.SUGGEST_URL_1 = 'https://termin.bremen.de/termine/suggest?mdt=704&select_cnc=1&cnc-8662=1&Strafanzeige+erstatten+=Weiter+1';
 exports.ENTRY_URL_2 = 'https://termin.bremen.de/termine/select2?md=6';
 exports.SUGGEST_URL_2 = 'https://termin.bremen.de/termine/suggest?cnc-8793=1&loc=681';
 exports.ENTRY_URL_3 = 'https://termin.bremen.de/termine/select2?md=5';
@@ -71,12 +69,6 @@ function fetchData(entryURL, suggestURL) {
     });
 }
 exports.fetchData = fetchData;
-function fetchPolizei() {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield fetchData(exports.ENTRY_URL_1, exports.SUGGEST_URL_1);
-    });
-}
-exports.fetchPolizei = fetchPolizei;
 function fetchBremenNord() {
     return __awaiter(this, void 0, void 0, function* () {
         return yield fetchData(exports.ENTRY_URL_2, exports.SUGGEST_URL_2);

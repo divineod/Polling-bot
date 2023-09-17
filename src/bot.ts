@@ -1,6 +1,6 @@
 import TelegramBot = require('node-telegram-bot-api')
 import { FirestoreUserRepository, User } from "./firestore"
-import { ENTRY_URL_1, ENTRY_URL_2, SUGGEST_URL_1, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher'
+import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher'
 
 export class TelegramConnection {
     private bot: TelegramBot;
