@@ -18,7 +18,6 @@ class TelegramConnection {
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.setupBotListeners();
-        this.broadcastToUsers();
     }
     broadcastToUsers(data, title) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -11,7 +11,6 @@ export class TelegramConnection {
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.setupBotListeners();
-        this.broadcastToUsers();
     }
 
     private async broadcastToUsers(data: any, title: string) {
