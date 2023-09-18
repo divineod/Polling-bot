@@ -75,3 +75,9 @@ export class TelegramConnection {
         }
     }
 }
+
+
+export function startTelegramBot(): void {
+    const userRepository = new FirestoreUserRepository(validatedEnv.GOOGLE_CREDENTIALS);
+    new TelegramConnection(validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
+}

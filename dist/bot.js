@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TelegramConnection = void 0;
+exports.startTelegramBot = exports.TelegramConnection = void 0;
 const TelegramBot = require("node-telegram-bot-api");
+const firestore_1 = require("./firestore");
 const fetcher_1 = require("./fetcher");
 class TelegramConnection {
     constructor(token, userRepository) {
@@ -82,4 +83,9 @@ class TelegramConnection {
     }
 }
 exports.TelegramConnection = TelegramConnection;
+function startTelegramBot() {
+    const userRepository = new firestore_1.FirestoreUserRepository(validatedEnv.GOOGLE_CREDENTIALS);
+    new TelegramConnection(validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
+}
+exports.startTelegramBot = startTelegramBot;
 //# sourceMappingURL=bot.js.map

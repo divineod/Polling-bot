@@ -1,3 +1,8 @@
-import { runCronJob } from './cron';
+// import { runCronJob } from './cron';
+//
+// runCronJob();
 
-runCronJob();
+
+import { startTelegramBot } from './bot';
+
+startTelegramBot();
