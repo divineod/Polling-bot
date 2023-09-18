@@ -1,5 +1,6 @@
 import TelegramBot = require('node-telegram-bot-api')
 import { FirestoreUserRepository, User } from "./firestore"
+import { validatedEnv } from "./settings";
 import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher'
 
 export class TelegramConnection {
