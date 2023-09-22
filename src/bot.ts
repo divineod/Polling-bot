@@ -2,7 +2,7 @@ import TelegramBot = require('node-telegram-bot-api');
 import { FirestoreUserRepository, FirestoreDatesRepository, User } from "./firestore";
 import { validatedEnv } from "./settings";
 import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher';
-import * as moment from 'moment';  // Ensure you have the moment library installed
+import moment from 'moment';
 
 export class TelegramConnection {
     private bot: TelegramBot;
