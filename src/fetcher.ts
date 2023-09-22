@@ -3,6 +3,9 @@ const cookieParser = require('cookie')
 import * as cheerio from 'cheerio'
 
 
+export const ENTRY_URL_1 = "https://termin.bremen.de/termine/select2?md=13"
+export const SUGGEST_URL_1 = "https://termin.bremen.de/termine/suggest?mdt=704&select_cnc=1&cnc-8662=1&Strafanzeige+erstatten+=Next+1"
+
 export const ENTRY_URL_2 = 'https://termin.bremen.de/termine/select2?md=6';
 export const SUGGEST_URL_2 = 'https://termin.bremen.de/termine/suggest?cnc-8793=1&loc=681';
 
@@ -45,4 +48,8 @@ export async function fetchBremenNord(): Promise<{ [date: string]: string[] }> {
 
 export async function fetchBremenMitte(): Promise<{ [date: string]: string[] }> {
     return await fetchData(ENTRY_URL_3, SUGGEST_URL_3)
+}
+
+export async function fetchBremenPolizei(): Promise<{ [date: string]: string[] }> {
+    return await fetchData(ENTRY_URL_1, SUGGEST_URL_1)
 }

@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FirestoreUserRepository = exports.FirestoreRepository = void 0;
+exports.FirestoreDatesRepository = exports.FirestoreUserRepository = exports.FirestoreRepository = void 0;
 const admin = __importStar(require("firebase-admin"));
 const app_1 = require("firebase-admin/app");
 const firewalk_1 = require("firewalk");
@@ -48,6 +48,9 @@ class FirestoreRepository {
     // Create a new document with an automatically generated ID
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
+            if ('firstName' in data) {
+                data.last_update = "2023-09-01";
+            }
             const docRef = yield this.collection.doc(data.id);
             docRef.set(data);
             return data;
@@ -106,7 +109,7 @@ exports.FirestoreRepository = FirestoreRepository;
 FirestoreRepository.isInitialized = false;
 class FirestoreUserRepository extends FirestoreRepository {
     constructor(credential) {
-        super(credential, "users");
+        super(credential, "users2");
     }
     getOrCreate(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -135,6 +138,40 @@ class FirestoreUserRepository extends FirestoreRepository {
             return users;
         });
     }
+    updateUser(userId, lastUpdateDate) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dateStr = lastUpdateDate.toISOString().split('T')[0];
+            yield this.update(userId, { last_update: dateStr });
+        });
+    }
 }
 exports.FirestoreUserRepository = FirestoreUserRepository;
+class FirestoreDatesRepository extends FirestoreRepository {
+    constructor(credential) {
+        super(credential, "fetched_dates");
+    }
+    addDates(site, dates) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Extract the dates from the dictionary keys
+            const dateKeys = Object.keys(dates);
+            // Get a reference to the Firestore document where we want to add these dates
+            const docRef = this.collection.doc('fetched_dates');
+            // Update the site field with the extracted dates
+            yield docRef.set({ [site]: dateKeys });
+        });
+    }
+    getDates(site) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const docSnapshot = yield this.collection.doc('fetched_dates').get();
+            if (docSnapshot.exists) {
+                const data = docSnapshot.data();
+                return data[site];
+            }
+            else {
+                return undefined;
+            }
+        });
+    }
+}
+exports.FirestoreDatesRepository = FirestoreDatesRepository;
 //# sourceMappingURL=firestore.js.map

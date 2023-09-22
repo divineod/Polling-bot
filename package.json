@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/http-proxy-agent": "^4.0.1",
+    "@types/moment": "^2.13.0",
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "cookie": "^0.5.0",
@@ -28,6 +29,7 @@
     "firewalk": "^1.0.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.1",
+    "moment": "^2.29.4",
     "node-fetch": "^3.3.2",
     "node-telegram-bot-api": "^0.61.0",
     "zod": "^3.22.2"
