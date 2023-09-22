@@ -20,7 +20,7 @@ const fetcher_1 = require("./fetcher");
 const moment_1 = __importDefault(require("moment"));
 class TelegramConnection {
     constructor(token, userRepository) {
-        this.previousData = {};
+        console.log('Got here.');
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new firestore_1.FirestoreDatesRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);

@@ -8,9 +8,9 @@ export class TelegramConnection {
     private bot: TelegramBot;
     private userRepository: FirestoreUserRepository;
     private datesRepository: FirestoreDatesRepository;
-    private previousData: { [key: string]: any } = {};
 
     constructor(token: string, userRepository: FirestoreUserRepository) {
+        console.log('Got here.')
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new FirestoreDatesRepository(validatedEnv.GOOGLE_CREDENTIALS);
