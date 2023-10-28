@@ -165,6 +165,7 @@ class FirestoreDatesRepository extends FirestoreRepository {
             const docSnapshot = yield this.collection.doc('fetched_dates').get();
             if (docSnapshot.exists) {
                 const data = docSnapshot.data();
+                console.log(data);
                 return data[site];
             }
             else {

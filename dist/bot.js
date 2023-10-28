@@ -18,6 +18,7 @@ const firestore_1 = require("./firestore");
 const settings_1 = require("./settings");
 const fetcher_1 = require("./fetcher");
 const moment_1 = __importDefault(require("moment"));
+const cron_1 = require("./cron");
 class DataSet {
     constructor(title, url1, url2) {
         this.title = title;
@@ -51,7 +52,7 @@ class TelegramConnection {
             const users = yield this.userRepository.getAllUsers();
             for (const user of users) {
                 if (user.id && (!user.last_update || user.last_update < today)) {
-                    this.sendMessageWithImage(user.id, data);
+                    yield this.sendMessageWithImage(user.id, (0, cron_1.dictionaryToText)(title, data));
                     // Update the user's last_update field to today's date
                     yield this.userRepository.updateUser(user.id, today_date);
                 }
@@ -67,7 +68,6 @@ class TelegramConnection {
             const dataSets = [
                 new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
                 new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
-                new DataSet("polizei", fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1)
             ];
             for (const dataSet of dataSets) {
                 const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
