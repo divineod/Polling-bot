@@ -46,8 +46,7 @@ export class TelegramConnection {
         const users = await this.userRepository.getAllUsers();
         for (const user of users) {
             if (user.id && (!user.last_update || user.last_update < today)) {
-                this.bot.sendMessage(user.id, `These are the dates from ${title}, ${user.firstName}!`);
-                this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
+                this.sendMessageWithImage(user.id, data)
 
                 // Update the user's last_update field to today's date
                 await this.userRepository.updateUser(user.id, today_date);
@@ -125,7 +124,7 @@ export class TelegramConnection {
             await this.bot.sendPhoto(chatId, 'media/DALL·E_2023_10_28_16_48_23_Illustration_of_the_robot_hamburger.png').catch(error => {
                 console.error(`Error sending message to ${chatId}: ${error.message || error}`);
             });
-            await this.sendMessage(chatId, message)
+            this.sendMessage(chatId, message)
         } else {
             console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);
         }
