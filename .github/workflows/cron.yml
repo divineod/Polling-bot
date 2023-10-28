@@ -1,8 +1,7 @@
 name: Scheduled Cron Job
 
 on:
- schedule:
-    - cron: "*/2 * * * *"
+  workflow_dispatch:
 
 jobs:
 
