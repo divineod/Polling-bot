@@ -59,6 +59,10 @@ class TelegramConnection {
             }
         });
     }
+    sendFormattedDates(chat_id, data) {
+        // this.bot.sendMessage(chat_id, dictionaryToText(data));
+        this.bot.sendMessage(chat_id, "blyad");
+    }
     setupBotListeners() {
         return __awaiter(this, void 0, void 0, function* () {
             const dataSets = [
@@ -87,7 +91,7 @@ class TelegramConnection {
             this.bot.onText(/\/nord/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
                 if (Object.keys(data).length > 0) {
-                    this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
+                    this.sendFormattedDates(msg.chat.id, data);
                 }
             }));
             this.bot.on('text', (msg) => __awaiter(this, void 0, void 0, function* () {
@@ -99,13 +103,27 @@ class TelegramConnection {
             console.log('Telegram bot is running...');
         });
     }
-    sendMessage(chatId, message) {
+    sendMessage(chatId, message, opts = { parse_mode: "markdown" }) {
         return __awaiter(this, void 0, void 0, function* () {
             const userExists = yield this.userRepository.userExists(chatId);
             if (userExists) {
-                this.bot.sendMessage(chatId, message).catch(error => {
+                this.bot.sendMessage(chatId, message, opts).catch(error => {
                     console.error(`Error sending message to ${chatId}: ${error.message || error}`);
                 });
+            }
+            else {
+                console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);
+            }
+        });
+    }
+    sendMessageWithImage(chatId, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userExists = yield this.userRepository.userExists(chatId);
+            if (userExists) {
+                yield this.bot.sendPhoto(chatId, 'media/DALL·E_2023_10_28_16_48_23_Illustration_of_the_robot_hamburger.png').catch(error => {
+                    console.error(`Error sending message to ${chatId}: ${error.message || error}`);
+                });
+                yield this.sendMessage(chatId, message);
             }
             else {
                 console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);

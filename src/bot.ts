@@ -4,6 +4,7 @@ import { FirestoreUserRepository, FirestoreDatesRepository, User } from "./fires
 import { validatedEnv } from "./settings";
 import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher';
 import moment from 'moment';
+import { dictionaryToText } from './cron';
 
 
 class DataSet {
@@ -11,7 +12,7 @@ class DataSet {
         public title: "mitte" | "nord" | "polizei",
         public url1: string,
         public url2: string
-    ) {}
+    ) { }
 }
 
 export class TelegramConnection {
@@ -55,6 +56,12 @@ export class TelegramConnection {
     }
 
 
+    private sendFormattedDates(chat_id: number, data: { [date: string]: string[] }) {
+        // this.bot.sendMessage(chat_id, dictionaryToText(data));
+        this.bot.sendMessage(chat_id, "blyad");
+    }
+
+
     private async setupBotListeners() {
 
         const dataSets = [
@@ -85,7 +92,7 @@ export class TelegramConnection {
         this.bot.onText(/\/nord/, async (msg) => {
             const data = await fetchData(ENTRY_URL_2, SUGGEST_URL_2);
             if (Object.keys(data).length > 0) {
-                this.bot.sendMessage(msg.chat.id, JSON.stringify(data, undefined, 4));
+                this.sendFormattedDates(msg.chat.id, data)
             }
         });
 
@@ -100,12 +107,25 @@ export class TelegramConnection {
         console.log('Telegram bot is running...');
     }
 
-    async sendMessage(chatId: string, message: string) {
+    async sendMessage(chatId: string, message: string, opts: any = {parse_mode: "markdown"}) {
         const userExists = await this.userRepository.userExists(chatId);
         if (userExists) {
-            this.bot.sendMessage(chatId, message).catch(error => {
+            this.bot.sendMessage(chatId, message, opts).catch(error => {
                 console.error(`Error sending message to ${chatId}: ${error.message || error}`);
             });
+        } else {
+            console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);
+        }
+    }
+
+    async sendMessageWithImage(chatId: string, message: string) {
+        const userExists = await this.userRepository.userExists(chatId);
+
+        if (userExists) {
+            await this.bot.sendPhoto(chatId, 'media/DALL·E_2023_10_28_16_48_23_Illustration_of_the_robot_hamburger.png').catch(error => {
+                console.error(`Error sending message to ${chatId}: ${error.message || error}`);
+            });
+            await this.sendMessage(chatId, message)
         } else {
             console.warn(`User ${chatId} does not exist or has blocked the bot. Skipping.`);
         }
