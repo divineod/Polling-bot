@@ -22,7 +22,7 @@ const port = process.env.PORT || 8080;
 app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userRepository = new firestore_1.FirestoreUserRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
     let _ = new bot_1.TelegramConnection(settings_1.validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
-    (0, fetcher_1.fetchPolizei)().then((timeTable) => {
+    (0, fetcher_1.fetchBremenPolizei)().then((timeTable) => {
         userRepository.mapAll((user) => {
             _.sendMessage(user.id, JSON.stringify(timeTable, undefined, 4));
         });

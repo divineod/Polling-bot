@@ -1,8 +1,18 @@
 import TelegramBot = require('node-telegram-bot-api');
 import { FirestoreUserRepository, FirestoreDatesRepository, User } from "./firestore";
+
 import { validatedEnv } from "./settings";
 import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher';
 import moment from 'moment';
+
+
+class DataSet {
+    constructor(
+        public title: "mitte" | "nord" | "polizei",
+        public url1: string,
+        public url2: string
+    ) {}
+}
 
 export class TelegramConnection {
     private bot: TelegramBot;
@@ -17,18 +27,19 @@ export class TelegramConnection {
         this.setupBotListeners();
     }
 
-    private async areDatesDifferent(data: any, title: string): Promise<boolean> {
-        const storedDates = await this.datesRepository.getDates(title.toLowerCase());
+    private async areDatesDifferent(data: any, title: "mitte" | "nord" | "polizei"): Promise<boolean> {
+        const storedDates = await this.datesRepository.getDates(title);
 
         if (!storedDates || JSON.stringify(storedDates) !== JSON.stringify(data)) {
             // Update Firestore with the new dates
-            await this.datesRepository.addDates(title.toLowerCase(), data);
+            await this.datesRepository.addDates(title, data);
             return true;
         }
         return false;
     }
 
     private async broadcastToUsers(data: any, title: string) {
+        const today_date = moment().toDate();
         const today = moment().format('YYYY-MM-DD');
 
         const users = await this.userRepository.getAllUsers();
@@ -38,15 +49,17 @@ export class TelegramConnection {
                 this.bot.sendMessage(user.id, JSON.stringify(data, undefined, 4));
 
                 // Update the user's last_update field to today's date
-                await this.userRepository.updateUser(user.id,  today );
+                await this.userRepository.updateUser(user.id, today_date);
             }
         }
     }
 
+
     private async setupBotListeners() {
+
         const dataSets = [
-            { url1: ENTRY_URL_2, url2: SUGGEST_URL_2, title: "Nord" },
-            { url1: ENTRY_URL_3, url2: SUGGEST_URL_3, title: "Mitte" }
+            new DataSet("nord", ENTRY_URL_2, SUGGEST_URL_2),
+            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3)
         ];
 
         for (const dataSet of dataSets) {

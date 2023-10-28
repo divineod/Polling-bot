@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express'
 
 import { TelegramConnection } from './bot'
 import { FirestoreUserRepository, User } from './firestore'
-import { fetchData, ENTRY_URL_1, SUGGEST_URL_1, ENTRY_URL_2, SUGGEST_URL_2, fetchPolizei } from './fetcher';
+import { fetchData, ENTRY_URL_1, SUGGEST_URL_1, ENTRY_URL_2, SUGGEST_URL_2, fetchBremenPolizei } from './fetcher';
 import { validatedEnv } from './settings';
 
 const app = express()
@@ -12,7 +12,7 @@ const port = process.env.PORT || 8080
 app.get('/', async (req: Request, res: Response) => {
     let userRepository = new FirestoreUserRepository(validatedEnv.GOOGLE_CREDENTIALS)
     let _ = new TelegramConnection(validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository)
-    fetchPolizei().then((timeTable: any) => {
+    fetchBremenPolizei().then((timeTable: any) => {
         userRepository.mapAll((user: User) => {
             _.sendMessage(user.id, JSON.stringify(timeTable, undefined, 4))
         })

@@ -8,7 +8,7 @@ interface BaseEntity {
 }
 
 export class FirestoreRepository<T extends BaseEntity> {
-    private collection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
+    protected collection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
 
     private static isInitialized: boolean = false;
 
@@ -27,13 +27,13 @@ export class FirestoreRepository<T extends BaseEntity> {
     // Create a new document with an automatically generated ID
     async create(data: T): Promise<T> {
         if ('firstName' in data) {
-        (data as any).last_update = "2023-09-01";
+            (data as any).last_update = "2023-09-01";
         }
 
         const docRef = await this.collection.doc(data.id);
         docRef.set(data);
         return data;
-        }
+    }
 
     // Read a document by ID
     async getById(id: string): Promise<T | undefined> {
@@ -90,6 +90,10 @@ export interface User extends BaseEntity {
     last_update?: string;
 }
 
+export interface BurgerDate extends BaseEntity {
+
+}
+
 export class FirestoreUserRepository extends FirestoreRepository<User> {
 
     constructor(credential: string) {
@@ -112,38 +116,38 @@ export class FirestoreUserRepository extends FirestoreRepository<User> {
     }
 
     async getAllUsers(): Promise<User[]> {
-    const usersSnapshot = await this.collection.get();
-    const users: User[] = [];
+        const usersSnapshot = await this.collection.get();
+        const users: User[] = [];
 
-    usersSnapshot.forEach(doc => {
-        users.push(doc.data() as User);
-    });
+        usersSnapshot.forEach(doc => {
+            users.push(doc.data() as User);
+        });
 
-    return users;
-}
+        return users;
+    }
 
-     async updateUser(userId: string, lastUpdateDate: Date): Promise<void> {
+    async updateUser(userId: string, lastUpdateDate: Date): Promise<void> {
         const dateStr = lastUpdateDate.toISOString().split('T')[0];
         await this.update(userId, { last_update: dateStr });
     }
 }
 
 
-export class FirestoreDatesRepository extends FirestoreRepository<User> {
+export class FirestoreDatesRepository extends FirestoreRepository<BurgerDate> {
 
     constructor(credential: string) {
         super(credential, "fetched_dates")
     }
 
     async addDates(site: 'mitte' | 'nord' | 'polizei', dates: { [date: string]: string[] }): Promise<void> {
-    // Extract the dates from the dictionary keys
-    const dateKeys = Object.keys(dates);
+        // Extract the dates from the dictionary keys
+        const dateKeys = Object.keys(dates);
 
-    // Get a reference to the Firestore document where we want to add these dates
-    const docRef = this.collection.doc('fetched_dates');
+        // Get a reference to the Firestore document where we want to add these dates
+        const docRef = this.collection.doc('fetched_dates');
 
-    // Update the site field with the extracted dates
-    await docRef.set({ [site]: dateKeys });
+        // Update the site field with the extracted dates
+        await docRef.set({ [site]: dateKeys });
     }
 
     async getDates(site: 'mitte' | 'nord' | 'polizei'): Promise<string[] | undefined> {
