@@ -65,20 +65,7 @@ class TelegramConnection {
     }
     setupBotListeners() {
         return __awaiter(this, void 0, void 0, function* () {
-            const dataSets = [
-                new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
-                new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
-            ];
-            for (const dataSet of dataSets) {
-                const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
-                // Check if dates are different
-                if (yield this.areDatesDifferent(data, dataSet.title)) {
-                    yield this.broadcastToUsers(data, dataSet.title);
-                }
-                else {
-                    console.log(`Dates for ${dataSet.title} have not changed.`);
-                }
-            }
+            // Initialize bot listeners
             this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
                 if (isCreated) {
@@ -101,6 +88,26 @@ class TelegramConnection {
                 console.error(`Telegram polling error: ${error.message || error}`);
             });
             console.log('Telegram bot is running...');
+            console.log('Starting data checking loop...');
+            // Data checking loop
+            while (true) {
+                const dataSets = [
+                    new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
+                    new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
+                ];
+                for (const dataSet of dataSets) {
+                    const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                    // Check if dates are different
+                    if (yield this.areDatesDifferent(data, dataSet.title)) {
+                        yield this.broadcastToUsers(data, dataSet.title);
+                    }
+                    else {
+                        console.log(`Dates for ${dataSet.title} have not changed.`);
+                    }
+                }
+                // Introduce a delay before the next iteration (e.g., 10 minutes)
+                yield new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
+            }
         });
     }
     sendMessage(chatId, message, opts = { parse_mode: "markdown" }) {

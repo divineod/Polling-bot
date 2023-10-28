@@ -72,23 +72,8 @@ export class TelegramConnection {
 
     private async setupBotListeners() {
 
-        const dataSets = [
-            new DataSet("nord", ENTRY_URL_2, SUGGEST_URL_2),
-            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3),
-        ];
-
-        for (const dataSet of dataSets) {
-            const data = await fetchData(dataSet.url1, dataSet.url2);
-
-            // Check if dates are different
-            if (await this.areDatesDifferent(data, dataSet.title)) {
-                await this.broadcastToUsers(data, dataSet.title);
-            } else {
-                console.log(`Dates for ${dataSet.title} have not changed.`);
-            }
-        }
-
-        this.bot.onText(/\/start/, async (msg) => {
+    // Initialize bot listeners
+     this.bot.onText(/\/start/, async (msg) => {
             const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
             if (isCreated) {
                 this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.firstName}!`);
@@ -112,8 +97,31 @@ export class TelegramConnection {
             console.error(`Telegram polling error: ${error.message || error}`);
         });
 
-        console.log('Telegram bot is running...');
+    console.log('Telegram bot is running...');
+    console.log('Starting data checking loop...');
+
+    // Data checking loop
+    while (true) {
+        const dataSets = [
+            new DataSet("nord", ENTRY_URL_2, SUGGEST_URL_2),
+            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3),
+        ];
+
+        for (const dataSet of dataSets) {
+            const data = await fetchData(dataSet.url1, dataSet.url2);
+
+            // Check if dates are different
+            if (await this.areDatesDifferent(data, dataSet.title)) {
+                await this.broadcastToUsers(data, dataSet.title);
+            } else {
+                console.log(`Dates for ${dataSet.title} have not changed.`);
+            }
+        }
+
+        // Introduce a delay before the next iteration (e.g., 10 minutes)
+        await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
     }
+}
 
     async sendMessage(chatId: string, message: string, opts: any = {parse_mode: "markdown"}) {
         const userExists = await this.userRepository.userExists(chatId);
