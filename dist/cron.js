@@ -30,13 +30,13 @@ function runCronJob() {
     (0, fetcher_1.fetchBremenMitte)().then((timeTable) => {
         const output = dictionaryToText('mitte', timeTable);
         userRepository.mapAll((user) => {
-            tgConnection.sendMessage(user.id, output);
+            tgConnection.sendMessageWithImage(user.id, output);
         });
     });
     (0, fetcher_1.fetchBremenNord)().then((timeTableNord) => {
         const output = dictionaryToText('nord', timeTableNord);
         userRepository.mapAll((user) => {
-            tgConnection.sendMessage(user.id, output);
+            tgConnection.sendMessageWithImage(user.id, output);
         });
     });
 }

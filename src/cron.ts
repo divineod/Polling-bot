@@ -33,14 +33,14 @@ export function runCronJob(): void {
     fetchBremenMitte().then((timeTable) => {
         const output = dictionaryToText('mitte', timeTable);
         userRepository.mapAll((user: User) => {
-            tgConnection.sendMessage(user.id, output);
+            tgConnection.sendMessageWithImage(user.id, output);
         });
     });
 
     fetchBremenNord().then((timeTableNord) => {
         const output = dictionaryToText('nord', timeTableNord);
         userRepository.mapAll((user: User) => {
-            tgConnection.sendMessage(user.id, output);
+            tgConnection.sendMessageWithImage(user.id, output);
         });
     });
 }
