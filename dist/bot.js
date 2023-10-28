@@ -66,7 +66,8 @@ class TelegramConnection {
         return __awaiter(this, void 0, void 0, function* () {
             const dataSets = [
                 new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
-                new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3)
+                new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
+                new DataSet("polizei", fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1)
             ];
             for (const dataSet of dataSets) {
                 const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);

@@ -2,7 +2,7 @@ import TelegramBot = require('node-telegram-bot-api');
 import { FirestoreUserRepository, FirestoreDatesRepository, User } from "./firestore";
 
 import { validatedEnv } from "./settings";
-import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData } from './fetcher';
+import { ENTRY_URL_2, SUGGEST_URL_2, ENTRY_URL_3, SUGGEST_URL_3, fetchData, SUGGEST_URL_1, ENTRY_URL_1 } from './fetcher';
 import moment from 'moment';
 import { dictionaryToText } from './cron';
 
@@ -65,7 +65,8 @@ export class TelegramConnection {
 
         const dataSets = [
             new DataSet("nord", ENTRY_URL_2, SUGGEST_URL_2),
-            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3)
+            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3),
+            new DataSet("polizei", ENTRY_URL_1, SUGGEST_URL_1)
         ];
 
         for (const dataSet of dataSets) {
