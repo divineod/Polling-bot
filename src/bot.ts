@@ -77,6 +77,8 @@ export class TelegramConnection {
             new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3),
         ];
 
+        console.log("Got into setupbotListeners()")
+
         for (const dataSet of dataSets) {
             const data = await fetchData(dataSet.url1, dataSet.url2);
 

@@ -69,6 +69,7 @@ class TelegramConnection {
                 new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
                 new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
             ];
+            console.log("Got into setupbotListeners()");
             for (const dataSet of dataSets) {
                 const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
                 // Check if dates are different
