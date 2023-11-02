@@ -28,7 +28,6 @@ class DataSet {
 }
 class TelegramConnection {
     constructor(token, userRepository) {
-        console.log('Got here.');
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new firestore_1.FirestoreDatesRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
@@ -49,6 +48,7 @@ class TelegramConnection {
         return __awaiter(this, void 0, void 0, function* () {
             const today_date = (0, moment_1.default)().toDate();
             const today = (0, moment_1.default)().format('YYYY-MM-DD');
+            console.log("The broadcast function is being  initiated");
             const users = yield this.userRepository.getAllUsers();
             for (const user of users) {
                 if (user.id && (!user.last_update || user.last_update < today)) {

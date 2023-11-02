@@ -1,56 +1,56 @@
-#name: Scheduled Cron Job
-#
-#on:
-#  schedule:
-#     - cron: "*/2 * * * *"
-#
-#jobs:
-#
-# check_previous_runs:
-#   runs-on: ubuntu-latest
-#
-#   steps:
-#     - name: Cancel and Delete Previous Runs
-#       run: |
-#         ids=$(curl -s \
-#           -X GET \
-#           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-#           -H "Accept: application/vnd.github.v3+json" \
-#           https://api.github.com/repos/divineod/Polling-bot/actions/runs | \
-#         jq '.workflow_runs[] | select([.status] | inside(["in_progress"])) | .id')
-#
-#         for i in $ids; do
-#           # Cancel the workflow run
-#           curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-#                -X POST "https://api.github.com/repos/divineod/Polling-bot/actions/runs/$i/cancel"
-#
-#           # Delete the workflow run
-#           curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-#                -X DELETE "https://api.github.com/repos/divineod/Polling-bot/actions/runs/$i"
-#         done
-#
-# build:
-#   runs-on: ubuntu-latest
-#
-#   strategy:
-#     matrix:
-#       node-version: [18.13.0]
-#
-#   steps:
-#   - name: Checkout repository
-#     uses: actions/checkout@v2
-#
-#   - name: Setup Node.js ${{ matrix.node-version }}
-#     uses: actions/setup-node@v2
-#     with:
-#       node-version: ${{ matrix.node-version }}
-#
-#   - name: Install dependencies
-#     run: npm install
-#
-#   - name: Run cron function
-#     run:
-#       node dist/cronexecutor.js
-#     env:
-#       TELEGRAM_BOT_ACCESS_TOKEN: ${{ secrets.TELEGRAM_BOT_ACCESS_TOKEN }}
-#       GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+name: Scheduled Cron Job
+
+on:
+  schedule:
+     - cron: "*/2 * * * *"
+
+jobs:
+
+ check_previous_runs:
+   runs-on: ubuntu-latest
+
+   steps:
+     - name: Cancel and Delete Previous Runs
+       run: |
+         ids=$(curl -s \
+           -X GET \
+           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+           -H "Accept: application/vnd.github.v3+json" \
+           https://api.github.com/repos/divineod/Polling-bot/actions/runs | \
+         jq '.workflow_runs[] | select([.status] | inside(["in_progress"])) | .id')
+
+         for i in $ids; do
+           # Cancel the workflow run
+           curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                -X POST "https://api.github.com/repos/divineod/Polling-bot/actions/runs/$i/cancel"
+
+           # Delete the workflow run
+           curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                -X DELETE "https://api.github.com/repos/divineod/Polling-bot/actions/runs/$i"
+         done
+
+ build:
+   runs-on: ubuntu-latest
+
+   strategy:
+     matrix:
+       node-version: [18.13.0]
+
+   steps:
+   - name: Checkout repository
+     uses: actions/checkout@v2
+
+   - name: Setup Node.js ${{ matrix.node-version }}
+     uses: actions/setup-node@v2
+     with:
+       node-version: ${{ matrix.node-version }}
+
+   - name: Install dependencies
+     run: npm install
+
+   - name: Run cron function
+     run:
+       node dist/cronexecutor.js
+     env:
+       TELEGRAM_BOT_ACCESS_TOKEN: ${{ secrets.TELEGRAM_BOT_ACCESS_TOKEN }}
+       GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}

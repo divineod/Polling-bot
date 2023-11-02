@@ -30,7 +30,6 @@ export class TelegramConnection {
     private datesRepository: FirestoreDatesRepository;
 
     constructor(token: string, userRepository: FirestoreUserRepository) {
-        console.log('Got here.')
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new FirestoreDatesRepository(validatedEnv.GOOGLE_CREDENTIALS);
@@ -51,6 +50,7 @@ export class TelegramConnection {
     private async broadcastToUsers(data: any, title: 'nord' | 'mitte' | 'polizei') {
         const today_date = moment().toDate();
         const today = moment().format('YYYY-MM-DD');
+        console.log("The broadcast function is being  initiated")
 
         const users = await this.userRepository.getAllUsers();
         for (const user of users) {
