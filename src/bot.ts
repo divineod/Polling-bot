@@ -30,7 +30,6 @@ export class TelegramConnection {
     private datesRepository: FirestoreDatesRepository;
 
     constructor(token: string, userRepository: FirestoreUserRepository) {
-        console.log('Got here.')
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new FirestoreDatesRepository(validatedEnv.GOOGLE_CREDENTIALS);
@@ -51,6 +50,7 @@ export class TelegramConnection {
     private async broadcastToUsers(data: any, title: 'nord' | 'mitte' | 'polizei') {
         const today_date = moment().toDate();
         const today = moment().format('YYYY-MM-DD');
+        console.log("The broadcast function is being  initiated")
 
         const users = await this.userRepository.getAllUsers();
         for (const user of users) {
@@ -72,8 +72,27 @@ export class TelegramConnection {
 
     private async setupBotListeners() {
 
-    // Initialize bot listeners
-     this.bot.onText(/\/start/, async (msg) => {
+
+        const dataSets = [
+            new DataSet("nord", ENTRY_URL_2, SUGGEST_URL_2),
+            new DataSet("mitte", ENTRY_URL_3, SUGGEST_URL_3),
+        ];
+
+        console.log("Got into setupbotListeners()")
+
+        for (const dataSet of dataSets) {
+            const data = await fetchData(dataSet.url1, dataSet.url2);
+
+            // Check if dates are different
+            if (await this.areDatesDifferent(data, dataSet.title)) {
+                await this.broadcastToUsers(data, dataSet.title);
+            } else {
+                console.log(`Dates for ${dataSet.title} have not changed.`);
+            }
+        }
+
+        this.bot.onText(/\/start/, async (msg) => {
+
             const [isCreated, user] = await this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
             if (isCreated) {
                 this.bot.sendMessage(msg.chat.id, `You are now subscribed, ${user.firstName}!`);

@@ -28,7 +28,6 @@ class DataSet {
 }
 class TelegramConnection {
     constructor(token, userRepository) {
-        console.log('Got here.');
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new firestore_1.FirestoreDatesRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
@@ -49,6 +48,7 @@ class TelegramConnection {
         return __awaiter(this, void 0, void 0, function* () {
             const today_date = (0, moment_1.default)().toDate();
             const today = (0, moment_1.default)().format('YYYY-MM-DD');
+            console.log("The broadcast function is being  initiated");
             const users = yield this.userRepository.getAllUsers();
             for (const user of users) {
                 if (user.id && (!user.last_update || user.last_update < today)) {
@@ -65,7 +65,23 @@ class TelegramConnection {
     }
     setupBotListeners() {
         return __awaiter(this, void 0, void 0, function* () {
-            // Initialize bot listeners
+
+            const dataSets = [
+                new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
+                new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
+            ];
+            console.log("Got into setupbotListeners()");
+            for (const dataSet of dataSets) {
+                const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                // Check if dates are different
+                if (yield this.areDatesDifferent(data, dataSet.title)) {
+                    yield this.broadcastToUsers(data, dataSet.title);
+                }
+                else {
+                    console.log(`Dates for ${dataSet.title} have not changed.`);
+                }
+            }
+
             this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
                 if (isCreated) {
