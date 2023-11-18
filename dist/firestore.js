@@ -109,7 +109,7 @@ exports.FirestoreRepository = FirestoreRepository;
 FirestoreRepository.isInitialized = false;
 class FirestoreUserRepository extends FirestoreRepository {
     constructor(credential) {
-        super(credential, "users2");
+        super(credential, "users");
     }
     getOrCreate(data) {
         return __awaiter(this, void 0, void 0, function* () {

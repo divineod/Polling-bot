@@ -133,6 +133,8 @@ class TelegramConnection {
 }
 exports.TelegramConnection = TelegramConnection;
 function startTelegramBot() {
+    console.log("GOOGLE_CREDENTIALS", settings_1.validatedEnv.GOOGLE_CREDENTIALS);
+    console.log("TELEGRAM_BOT_ACCESS_TOKEN", settings_1.validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN);
     const userRepository = new firestore_1.FirestoreUserRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
     new TelegramConnection(settings_1.validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
 }

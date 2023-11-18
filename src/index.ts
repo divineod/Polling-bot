@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 
-import { TelegramConnection } from './bot'
+import { TelegramConnection, startTelegramBot } from './bot'
 import { FirestoreUserRepository, User } from './firestore'
 import { fetchData, ENTRY_URL_1, SUGGEST_URL_1, ENTRY_URL_2, SUGGEST_URL_2, fetchBremenPolizei } from './fetcher';
 import { validatedEnv } from './settings';

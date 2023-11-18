@@ -97,7 +97,7 @@ export interface BurgerDate extends BaseEntity {
 export class FirestoreUserRepository extends FirestoreRepository<User> {
 
     constructor(credential: string) {
-        super(credential, "users2")
+        super(credential, "users")
     }
 
     async getOrCreate(data: User): Promise<[boolean, User]> {
