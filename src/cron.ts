@@ -1,5 +1,5 @@
 import { TelegramConnection } from "./bot"
-import { fetchData, fetchBremenMitte, fetchBremenNord } from "./fetcher"
+// import { fetchData } from './fetchData';
 import { FirestoreUserRepository, User } from "./firestore"
 import { validatedEnv } from "./settings"
 
@@ -8,7 +8,13 @@ var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'S
 
 // Convert the dictionary to a human-readable text
 export function dictionaryToText(site: 'nord' | 'mitte' | 'polizei', dictionary: { [date: string]: string[] }): string {
-    let text = `🍔 🤖\n\n${site.toUpperCase()}` + '\n\n\n';
+    let text = `${site.toUpperCase()}` + ' 🍔🤖' + '\n\n';
+
+    console.log(`Date dictionary for ${site} is ${JSON.stringify(dictionary)}`)
+
+    if (Object.keys(dictionary).length == 0) {
+        return text + "No dates available."
+    }
 
     for (const date in dictionary) {
         const parts = date.split("."); // Split the date string by hyphens
@@ -22,7 +28,7 @@ export function dictionaryToText(site: 'nord' | 'mitte' | 'polizei', dictionary:
             text += `    ${time}\n`;
         }
         text += '\n\n'
-    }
+    } 
     return text;
 }
 
@@ -30,17 +36,18 @@ export function runCronJob(): void {
     const userRepository = new FirestoreUserRepository(validatedEnv.GOOGLE_CREDENTIALS);
     const tgConnection = new TelegramConnection(validatedEnv.TELEGRAM_BOT_ACCESS_TOKEN, userRepository);
 
-    fetchBremenMitte().then((timeTable) => {
-        const output = dictionaryToText('mitte', timeTable);
-        userRepository.mapAll((user: User) => {
-            tgConnection.sendMessageWithImage(user.id, output);
-        });
-    });
+    // TODO: rewrite to use fetchData
+    // fetchBremenMitte().then((timeTable) => {
+    //     const output = dictionaryToText('mitte', timeTable);
+    //     userRepository.mapAll((user: User) => {
+    //         tgConnection.sendMessageWithImage(user.id, output);
+    //     });
+    // });
 
-    fetchBremenNord().then((timeTableNord) => {
-        const output = dictionaryToText('nord', timeTableNord);
-        userRepository.mapAll((user: User) => {
-            tgConnection.sendMessageWithImage(user.id, output);
-        });
-    });
+    // fetchBremenNord().then((timeTableNord) => {
+    //     const output = dictionaryToText('nord', timeTableNord);
+    //     userRepository.mapAll((user: User) => {
+    //         tgConnection.sendMessageWithImage(user.id, output);
+    //     });
+    // });
 }

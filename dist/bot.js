@@ -17,13 +17,18 @@ const TelegramBot = require("node-telegram-bot-api");
 const firestore_1 = require("./firestore");
 const settings_1 = require("./settings");
 const fetcher_1 = require("./fetcher");
+const fetcher_2 = require("./fetcher");
 const moment_1 = __importDefault(require("moment"));
 const cron_1 = require("./cron");
+// To disable a stupid deprecation warning on the side of the node telegram library
+process.env.NTBA_FIX_350 = "true";
 class DataSet {
-    constructor(title, url1, url2) {
+    constructor(title, url1, url2, payload, contentType) {
         this.title = title;
         this.url1 = url1;
         this.url2 = url2;
+        this.payload = payload;
+        this.contentType = contentType;
     }
 }
 class TelegramConnection {
@@ -68,16 +73,16 @@ class TelegramConnection {
     broadcastAll() {
         return __awaiter(this, void 0, void 0, function* () {
             const dataSets = [
-                // new DataSet("nord", ENTRY_URL_NORD, SUGGEST_URL_NORD),
-                new DataSet("mitte", fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE),
-                // new DataSet("polizei", ENTRY_URL_POLIZEI, SUGGEST_URL_POLIZEI),
+                new DataSet("nord", fetcher_1.ENTRY_URL_NORD, fetcher_1.SUGGEST_URL_NORD, fetcher_1.NORD_PAYLOAD, "formdata"),
+                new DataSet("mitte", fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE, fetcher_1.MITTE_PAYLOAD, "formdata"),
+                // new DataSet("polizei", ENTRY_URL_POLIZEI, SUGGEST_URL_POLIZEI, POLIZEI_PAYLOAD, "formdata"),
             ];
             console.log("Got into setupbotListeners()");
             for (const dataSet of dataSets) {
                 let data;
                 // TODO: finish making empty date lists more apparent to the end users
                 try {
-                    data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                    data = yield (0, fetcher_2.fetchData)(dataSet.url1, dataSet.url2, dataSet.payload, dataSet.contentType);
                 }
                 catch (error) {
                     if (error instanceof fetcher_1.KeineTermineFreiBurgerError) {
@@ -89,6 +94,7 @@ class TelegramConnection {
                     throw error;
                 }
                 // Check if dates are different
+                // TODO: remove true
                 if ((yield this.areDatesDifferent(data, dataSet.title)) || true) {
                     yield this.broadcastToUsers(data, dataSet.title);
                 }
@@ -111,32 +117,47 @@ class TelegramConnection {
             }));
             this.bot.onText(/\/nord/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 console.log("Requested crawling for nord");
-                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_NORD, fetcher_1.SUGGEST_URL_NORD);
-                if (Object.keys(data).length > 0) {
-                    this.sendFormattedDates(msg.chat.id, "nord", data);
+                let data;
+                try {
+                    data = yield (0, fetcher_2.fetchData)(fetcher_1.ENTRY_URL_NORD, fetcher_1.SUGGEST_URL_NORD, fetcher_1.NORD_PAYLOAD, "formdata");
                 }
-                else {
-                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                catch (error) {
+                    if (error instanceof fetcher_1.KeineTermineFreiBurgerError) {
+                        this.bot.sendMessage(msg.chat.id, "No dates.");
+                    }
+                    else {
+                        this.sendFormattedDates(msg.chat.id, "nord", data);
+                    }
                 }
             }));
             this.bot.onText(/\/mitte/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 console.log("Requested crawling for mitte");
-                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE);
-                if (Object.keys(data).length > 0) {
-                    this.sendFormattedDates(msg.chat.id, "mitte", data);
+                let data;
+                try {
+                    data = yield (0, fetcher_2.fetchData)(fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE, fetcher_1.MITTE_PAYLOAD, "formdata");
                 }
-                else {
-                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                catch (error) {
+                    if (error instanceof fetcher_1.KeineTermineFreiBurgerError) {
+                        this.bot.sendMessage(msg.chat.id, "No dates.");
+                    }
+                    else {
+                        this.sendFormattedDates(msg.chat.id, "mitte", data);
+                    }
                 }
             }));
             this.bot.onText(/\/polizei/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 console.log("Requested crawling for polizei");
-                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_POLIZEI, fetcher_1.SUGGEST_URL_POLIZEI);
-                if (Object.keys(data).length > 0) {
-                    this.sendFormattedDates(msg.chat.id, "polizei", data);
+                let data;
+                try {
+                    data = yield (0, fetcher_2.fetchData)(fetcher_1.ENTRY_URL_POLIZEI, fetcher_1.SUGGEST_URL_POLIZEI, fetcher_1.POLIZEI_PAYLOAD, "formdata");
                 }
-                else {
-                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                catch (error) {
+                    if (error instanceof fetcher_1.KeineTermineFreiBurgerError) {
+                        this.bot.sendMessage(msg.chat.id, "No dates.");
+                    }
+                    else {
+                        this.sendFormattedDates(msg.chat.id, "polizei", data);
+                    }
                 }
             }));
             this.bot.onText(/\/broadcast/, (msg) => __awaiter(this, void 0, void 0, function* () {
@@ -169,7 +190,7 @@ class TelegramConnection {
         return __awaiter(this, void 0, void 0, function* () {
             const userExists = yield this.userRepository.userExists(chatId);
             if (userExists) {
-                yield this.bot.sendPhoto(chatId, 'media/DALL·E_2023_10_28_16_48_23_Illustration_of_the_robot_hamburger.png').catch(error => {
+                yield this.bot.sendPhoto(chatId, 'media/hamburger-cropped.png', {}, { contentType: 'image/x-png', }).catch(error => {
                     console.error(`Error sending message to ${chatId}: ${error.message || error}`);
                 });
                 this.sendMessage(chatId, message);

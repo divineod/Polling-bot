@@ -12,6 +12,7 @@ export const env = z.object({
         return z.NEVER
       }
     }),
+  ENABLE_MITM: z.coerce.boolean()
 });
 
 export const validatedEnv = env.parse(process.env);
