@@ -14,6 +14,7 @@ exports.env = zod_1.z.object({
             return zod_1.z.NEVER;
         }
     }),
+    ENABLE_MITM: zod_1.z.boolean()
 });
 exports.validatedEnv = exports.env.parse(process.env);
 //# sourceMappingURL=settings.js.map

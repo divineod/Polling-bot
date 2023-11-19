@@ -18,6 +18,7 @@ const firestore_1 = require("./firestore");
 const settings_1 = require("./settings");
 const fetcher_1 = require("./fetcher");
 const moment_1 = __importDefault(require("moment"));
+const cron_1 = require("./cron");
 class DataSet {
     constructor(title, url1, url2) {
         this.title = title;
@@ -27,7 +28,6 @@ class DataSet {
 }
 class TelegramConnection {
     constructor(token, userRepository) {
-        console.log('Got here.');
         this.bot = new TelegramBot(token, { polling: true });
         this.userRepository = userRepository;
         this.datesRepository = new firestore_1.FirestoreDatesRepository(settings_1.validatedEnv.GOOGLE_CREDENTIALS);
@@ -49,36 +49,57 @@ class TelegramConnection {
             const today_date = (0, moment_1.default)().toDate();
             const today = (0, moment_1.default)().format('YYYY-MM-DD');
             const users = yield this.userRepository.getAllUsers();
+            console.log("The broadcast function is being initiated");
+            console.log(`users ${JSON.stringify(users)}`);
             for (const user of users) {
-                if (user.id && (!user.last_update || user.last_update < today)) {
-                    this.sendMessageWithImage(user.id, data);
+                // if (user.id && (!user.last_update || user.last_update < today)) {
+                if (true) {
+                    yield this.sendMessageWithImage(user.id, (0, cron_1.dictionaryToText)(title, data));
                     // Update the user's last_update field to today's date
                     yield this.userRepository.updateUser(user.id, today_date);
                 }
             }
         });
     }
-    sendFormattedDates(chat_id, data) {
-        // this.bot.sendMessage(chat_id, dictionaryToText(data));
-        this.bot.sendMessage(chat_id, "blyad");
+    sendFormattedDates(chat_id, title, data) {
+        this.bot.sendMessage(chat_id, (0, cron_1.dictionaryToText)(title, data));
+        // this.bot.sendMessage(chat_id, "blyad");
     }
-    setupBotListeners() {
+    broadcastAll() {
         return __awaiter(this, void 0, void 0, function* () {
             const dataSets = [
-                new DataSet("nord", fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2),
-                new DataSet("mitte", fetcher_1.ENTRY_URL_3, fetcher_1.SUGGEST_URL_3),
-                new DataSet("polizei", fetcher_1.ENTRY_URL_1, fetcher_1.SUGGEST_URL_1)
+                // new DataSet("nord", ENTRY_URL_NORD, SUGGEST_URL_NORD),
+                new DataSet("mitte", fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE),
+                // new DataSet("polizei", ENTRY_URL_POLIZEI, SUGGEST_URL_POLIZEI),
             ];
+            console.log("Got into setupbotListeners()");
             for (const dataSet of dataSets) {
-                const data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                let data;
+                // TODO: finish making empty date lists more apparent to the end users
+                try {
+                    data = yield (0, fetcher_1.fetchData)(dataSet.url1, dataSet.url2);
+                }
+                catch (error) {
+                    if (error instanceof fetcher_1.KeineTermineFreiBurgerError) {
+                        console.log(`No slots for ${dataSet.title}`);
+                        yield this.broadcastToUsers({}, dataSet.title);
+                        continue;
+                    }
+                    console.log(`Error ${error.message}}`);
+                    throw error;
+                }
                 // Check if dates are different
-                if (yield this.areDatesDifferent(data, dataSet.title)) {
+                if ((yield this.areDatesDifferent(data, dataSet.title)) || true) {
                     yield this.broadcastToUsers(data, dataSet.title);
                 }
                 else {
                     console.log(`Dates for ${dataSet.title} have not changed.`);
                 }
             }
+        });
+    }
+    setupBotListeners() {
+        return __awaiter(this, void 0, void 0, function* () {
             this.bot.onText(/\/start/, (msg) => __awaiter(this, void 0, void 0, function* () {
                 const [isCreated, user] = yield this.userRepository.getOrCreate({ id: msg.chat.id.toString(), firstName: msg.chat.first_name });
                 if (isCreated) {
@@ -89,10 +110,38 @@ class TelegramConnection {
                 }
             }));
             this.bot.onText(/\/nord/, (msg) => __awaiter(this, void 0, void 0, function* () {
-                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_2, fetcher_1.SUGGEST_URL_2);
+                console.log("Requested crawling for nord");
+                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_NORD, fetcher_1.SUGGEST_URL_NORD);
                 if (Object.keys(data).length > 0) {
-                    this.sendFormattedDates(msg.chat.id, data);
+                    this.sendFormattedDates(msg.chat.id, "nord", data);
                 }
+                else {
+                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                }
+            }));
+            this.bot.onText(/\/mitte/, (msg) => __awaiter(this, void 0, void 0, function* () {
+                console.log("Requested crawling for mitte");
+                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE);
+                if (Object.keys(data).length > 0) {
+                    this.sendFormattedDates(msg.chat.id, "mitte", data);
+                }
+                else {
+                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                }
+            }));
+            this.bot.onText(/\/polizei/, (msg) => __awaiter(this, void 0, void 0, function* () {
+                console.log("Requested crawling for polizei");
+                const data = yield (0, fetcher_1.fetchData)(fetcher_1.ENTRY_URL_POLIZEI, fetcher_1.SUGGEST_URL_POLIZEI);
+                if (Object.keys(data).length > 0) {
+                    this.sendFormattedDates(msg.chat.id, "polizei", data);
+                }
+                else {
+                    this.bot.sendMessage(msg.chat.id, "No dates.");
+                }
+            }));
+            this.bot.onText(/\/broadcast/, (msg) => __awaiter(this, void 0, void 0, function* () {
+                console.log("Requested broadcast");
+                yield this.broadcastAll();
             }));
             this.bot.on('text', (msg) => __awaiter(this, void 0, void 0, function* () {
                 this.bot.sendMessage(msg.chat.id, "I am online!");

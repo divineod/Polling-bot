@@ -8,7 +8,7 @@ const settings_1 = require("./settings");
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 // Convert the dictionary to a human-readable text
 function dictionaryToText(site, dictionary) {
-    let text = `🍔 🤖\n\n${site.toUpperCase()}` + '\n\n\n';
+    let text = `${site.toUpperCase()}` + ' 🍔🤖' + '\n\n\n';
     for (const date in dictionary) {
         const parts = date.split("."); // Split the date string by hyphens
         const day = parseInt(parts[0], 10); // Parse the day as an integer
