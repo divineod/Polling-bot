@@ -63,6 +63,7 @@ export class TelegramConnection {
         console.log(`users ${JSON.stringify(users)}`)
 
         for (const user of users) {
+            // TODO: Does this actually work? last_update is a string
             // if (user.id && (!user.last_update || user.last_update < today)) {
             if (true) {
                 await this.sendMessageWithImage(user.id, dictionaryToText(title, data))

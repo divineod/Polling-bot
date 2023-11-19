@@ -57,6 +57,7 @@ class TelegramConnection {
             console.log("The broadcast function is being initiated");
             console.log(`users ${JSON.stringify(users)}`);
             for (const user of users) {
+                // TODO: Does this actually work? last_update is a string
                 // if (user.id && (!user.last_update || user.last_update < today)) {
                 if (true) {
                     yield this.sendMessageWithImage(user.id, (0, cron_1.dictionaryToText)(title, data));
