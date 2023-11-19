@@ -155,6 +155,7 @@ export class FirestoreDatesRepository extends FirestoreRepository<BurgerDate> {
 
         if (docSnapshot.exists) {
             const data = docSnapshot.data() as { [key: string]: string[] };
+            console.log(data)
             return data[site];
         } else {
             return undefined;

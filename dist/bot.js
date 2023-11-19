@@ -78,7 +78,6 @@ class TelegramConnection {
                 new DataSet("mitte", fetcher_1.ENTRY_URL_MITTE, fetcher_1.SUGGEST_URL_MITTE, fetcher_1.MITTE_PAYLOAD, "formdata"),
                 // new DataSet("polizei", ENTRY_URL_POLIZEI, SUGGEST_URL_POLIZEI, POLIZEI_PAYLOAD, "formdata"),
             ];
-            console.log("Got into setupbotListeners()");
             for (const dataSet of dataSets) {
                 let data;
                 // TODO: finish making empty date lists more apparent to the end users

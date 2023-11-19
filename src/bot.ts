@@ -85,8 +85,6 @@ export class TelegramConnection {
             // new DataSet("polizei", ENTRY_URL_POLIZEI, SUGGEST_URL_POLIZEI, POLIZEI_PAYLOAD, "formdata"),
         ];
 
-        console.log("Got into setupbotListeners()")
-
         for (const dataSet of dataSets) {
             let data: any
 
